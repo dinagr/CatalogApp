@@ -1,0 +1,174 @@
+<html>
+<head>
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:700' rel='stylesheet' type='text/css'>
+	<link rel=stylesheet type=text/css href="{{url_for('static', filename='bootstrap.css')}}">
+    <link rel=stylesheet type=text/css href="{{url_for('static', filename='restStyle.css')}}">
+     <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+   	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="//apis.google.com/js/platform.js?onload=start"> </script>
+	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+</head>
+<body class="mainBcg">
+	<div class = "container">
+		<div class="row headline">
+			<div class="col-md-2 login">
+				<!-- GOOGLE PLUS SIGN IN-->
+	        	<div id="signInButton">
+	          		<span class="g-signin"
+			            data-scope="openid email"
+			            data-clientid="520637716286-3dmitri8c2324dlsq3g5q8d43nk7qtuu.apps.googleusercontent.com"
+			            data-redirecturi="postmessage"
+			            data-accesstype="offline"
+			            data-cookiepolicy="single_host_origin"
+			            data-callback="signInCallback"
+			            data-approvalprompt="force">
+	          		</span>
+	        	</div>
+
+				<div id="result"></div>
+
+				<script>
+				function signInCallback(authResult) {
+				  if (authResult['code']) {
+				    // Hide the sign-in button now that the user is authorized
+				    $('#signinButton').attr('style', 'display: none');
+				    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+				    $.ajax({
+				      type: 'POST',
+				      url: '/gconnect?state={{STATE}}',
+				      processData: false,
+				      data: authResult['code'],
+				      contentType: 'application/octet-stream; charset=utf-8',
+				      success: function(result) {
+				        // Handle or verify the server response if necessary.
+				        if (result) {
+				          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+				         setTimeout(function() {
+				          window.location.href = '{{url_for('allCategories') }}';
+				         }, 1000);
+				          
+				      } else if (authResult['error']) {
+				    console.log('There was an error: ' + authResult['error']);
+				  } else {
+				        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+				         }
+				      }
+				      
+				  }); } }
+				</script>
+
+
+
+				<!--END GOOGLE PLUS SIGN IN -->
+
+				<!--FACEBOOK SIGN IN -->
+
+				<script>
+				  window.fbAsyncInit = function() {
+				  FB.init({
+				    appId      : '1720398044864154',
+				    cookie     : true,  // enable cookies to allow the server to access 
+				                        // the session
+				    xfbml      : true,  // parse social plugins on this page
+				    version    : 'v2.2' // use version 2.2
+				  });
+				  };
+				  // Load the SDK asynchronously
+				  (function(d, s, id) {
+				    var js, fjs = d.getElementsByTagName(s)[0];
+				    if (d.getElementById(id)) return;
+				    js = d.createElement(s); js.id = id;
+				    js.src = "//connect.facebook.net/en_US/sdk.js";
+				    fjs.parentNode.insertBefore(js, fjs);
+				  }(document, 'script', 'facebook-jssdk'));
+				  // Here we run a very simple test of the Graph API after login is
+				  // successful.  See statusChangeCallback() for when this call is made.
+				  function sendTokenToServer() {
+				    var access_token = FB.getAuthResponse()['accessToken'];
+				    console.log(access_token)
+				    console.log('Welcome!  Fetching your information.... ');
+				    FB.api('/me', function(response) {
+				      console.log('Successful login for: ' + response.name);
+				     $.ajax({
+				      type: 'POST',
+				      url: '/fbconnect?state={{STATE}}',
+				      processData: false,
+				      data: access_token,
+				      contentType: 'application/octet-stream; charset=utf-8',
+				      success: function(result) {
+				        // Handle or verify the server response if necessary.
+				        if (result) {
+				          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+				         setTimeout(function() {
+				          window.location.href = "/main/";
+				         }, 4000);
+				          
+				      } else {
+				        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+				         }
+				      }
+				      
+				  });
+				    });
+				  }
+				</script>
+				<button>
+         			<fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+						<a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+					</fb:login-button>
+					<div id="status">
+					</div>
+				</button>
+				<!--END FACEBOOK SIGN IN -->
+			</div>
+			<div class="col-md-8">
+				<h1>Catalog App</h1>
+			</div>
+			<div class="col-md-2">
+				<div class="user">{{user}}</div>
+			</div>
+		</div>
+		</br>
+		<div class="row">
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages() %}
+		        {% if messages %}
+		            <ul>
+		            {% for message in messages%}
+		            <div class="alert alert-success">
+						{{message}}
+					</div>
+		            {% endfor %}
+		            </ul>
+		        {% endif %}
+		            {% endwith %}
+		    </div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 restBox">
+					<div class="row">
+						<div class="col-md-1">
+						</div>
+						<div class="col-md-3">
+							<h3>Categories</h3>
+							<div class="list-group">
+								{% for category in categories %}
+								 	<a href='{{url_for('categoryItems', category_name = category.name) }}' class="list-group-item categories">{{category.name}}</a>
+								 {% endfor %}
+								 {% if login_session.username %}
+								<a class="btn btn-success btn-sm" href='{{url_for('newCategory') }}' role="button">Add a new category</a>
+							{% endif %}
+							</div>
+						</div>
+						<div class="col-md-8">
+							<h3>Recently added items</h3>
+								{% for i in items %}
+								 <p class="list-group-item">{{i[0]}} ({{i[1]}})</p>
+								 {% endfor %}
+						</div>
+					</div>
+			</div>	
+		</div>
+	</div>
+</body>
+</html>

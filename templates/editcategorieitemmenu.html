@@ -1,0 +1,40 @@
+<!-- extend base layout -->
+{% extends "subBase.html" %}
+{% block content %}
+		<div class="row">
+			<div class="col-md-12">
+    			<h3>Edit Item</h3>
+    		</div>
+    	</div>
+		<div class="row">
+			<div class="col-md-12">
+				<form action="{{url_for('editCategoryItem', category_name=category_name, item_name=item.name)}}" method = 'POST' role="form">
+				  	<div class="form-group">
+				    	<label for="name">Name:</label>
+				    	<input type="text" class="form-control" id="name" name="name" placeholder='{{item.name}}'>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="description">Description:</label>
+				    	<input type="text" class="form-control" id="description" name="description" placeholder='{{item.description}}'>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="description">Picture:</label>
+				    	<input type="text" class="form-control" id="picture" name="picture" placeholder='{{item.picture}}'>
+				  	</div>
+				  	<div class="form-group">
+					  	<label for="category">Category:</label>
+					  	<select class="form-control" id="category" name="category">
+					  		<option>{{category_name}}</option>
+					  		{% for category in categories %}
+					  			{% if category.name != category_name %}
+					    			<option>{{category.name}}</option>
+					    		{% endif %}
+							{% endfor %}
+					  	</select>
+					</div>
+				  	<button type="submit" class="btn btn-default">Submit</button>
+				</form>
+				<a class="btn btn-danger" href="{{ url_for('categoryItemDetails', category_name=category_name, item_name=item.name)}}" role="button">Cancel</a>
+			</div>
+{% endblock %}
+

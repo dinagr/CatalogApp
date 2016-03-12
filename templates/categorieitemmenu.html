@@ -1,0 +1,56 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% block content %}
+		</br>
+		<div class="row">
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages() %}
+		        {% if messages %}
+		            <ul>
+		            {% for message in messages%}
+		            <div class="alert alert-success">
+						{{message}}
+					</div>
+		            {% endfor %}
+		            </ul>
+		        {% endif %}
+		            {% endwith %}
+		    </div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 restBox">
+					<div class="row">
+						<div class="col-md-1">
+						</div>
+						<div class="col-md-3">
+							<h3>Categories</h3>
+							<div class="list-group">
+								{% for c in categories %}
+									{% if c.name == category_name %}
+										 <a href='{{url_for('categoryItems', category_name = c.name) }}' class="list-group-item active categories">{{c.name}}</a>
+									{% else %}
+										<a href='{{url_for('categoryItems', category_name = c.name) }}' class="list-group-item categories">{{c.name}}</a>
+									{% endif %}
+								{% endfor %}
+								{% if login_session.username %}
+								<a class="btn btn-success btn-sm" href='{{url_for('newCategory') }}' role="button">Add a new category</a>
+							{% endif %}
+							</div>
+						</div>
+						<div class="col-md-8">
+							<h3>Item - {{items.name}}</h3>
+							<p class="list-group-item">{{items.description}}</p>
+							{% if items.picture %}
+							<img src = '{{items.picture}}'>
+							{% endif %}
+							<p class="list-group-item">(Created at {{items.timestmp}})</p>
+							{% if login_session.user_id == items.user_id %}
+							<a class="btn btn-info btn-sm" href='{{url_for('editCategoryItem', category_name = category_name, item_name = items.name) }}' role="button">Edit</a>
+							<a class="btn btn-danger btn-sm" href='{{url_for('deleteCategoryItem', category_name = category_name, item_name = items.name) }}' role="button" >Delete</a>
+							{% endif %}
+							<a  class="btn btn-primary btn-sm" href='{{url_for('categoryItems', category_name = category_name) }}' role="button">Go back to all items</a>
+						</div>
+				</div>
+			</div>	
+		</div>
+	{% endblock %}

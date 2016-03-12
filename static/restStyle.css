@@ -1,0 +1,143 @@
+body{
+	text-align: center;
+}
+
+.mainBcg{
+	background-image: url('bcg2.png');	
+}
+
+h1 {
+	font-family: 'Montserrat', sans-serif;
+	color:    #808080;
+	font-size: 45px;
+	font-weight: 700;
+}
+
+h3{
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 700; 
+	color:  #808080;
+	font-size: 30px;
+}
+
+.logginMessage{
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 600; 
+	color:  #000000;
+	font-size: 14px;
+}
+
+strong{
+	font-weight: 800; 
+}
+
+.user{
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 600; 
+	color:  #000000;
+	font-size: 14px;
+	margin-top: 5%;
+}
+
+ul{
+	list-style-type:none;
+}
+
+li{
+	display: inline;
+}
+
+.restBox{
+	border-width: 7px;
+	border-color:  #99bbff;
+	background-image: url('brick.png');
+	border-bottom: 1%;
+}
+
+.login{  
+	margin-top: 2%;
+}
+
+.loginButtons{
+	margin-top: 10%;
+}
+
+.edit{
+	background-image: url('edit.jpg');	
+}
+
+.list-group{
+	margin-top: 5%;
+	background-color: transparent;
+}
+
+.list-group-item{
+	background-color: transparent;
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 700; 
+	font-size: 14px;
+}
+
+p.list-group-item{
+	color: 
+}
+
+.btn{
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 600; 
+}
+
+.subPage{
+	background-color:  #ffffff;
+	outline: 1px solid #808080;
+}
+
+.mainForm{
+	background-image: url('paper.png');
+}
+
+.headline{
+	background-color: #ffffff;
+	border-style: solid;
+    border-bottom-color: #808080;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
+
+.categories{
+	font-size: 18px;
+}
+
+.subHeadline{
+	text-align: left;
+	color: #337ab7;
+}
+
+.subBcg{
+	background-color:  #ffffff;
+}
+
+.formLabel{
+	font-family: 'Metrophobic', Arial, serif; 
+	font-weight: 600; 
+	font-size: 16px;
+	margin-bottom: 2%;
+	margin-top: 2%;
+}
+
+.del{
+	width: 10%;
+	height: 10%;
+}
+
+.categoryInITem{
+	color:  #000000;
+	font-weight: 700;
+	font-size: 18px;
+}
+
+img{
+	max-width: 100px; 
+	max-height: 100px;
+}

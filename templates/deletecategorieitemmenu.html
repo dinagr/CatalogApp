@@ -1,0 +1,22 @@
+<!-- extend base layout -->
+{% extends "subBase.html" %}
+{% block content %}
+		<div class="row">
+			<div class="col-md-12">
+				<h3>Delete Item</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<form action="{{ url_for('deleteCategoryItem',category_name = category_name, item_name=item.name)}}" method = 'POST'  role="form">
+					<div class="form-group">
+					 	<label for="name">Are you sure that you wan to delete item <strong>{{item.name}}</strong> ?</label>
+					</div>
+					<button type="submit" ,value="Delete" class="btn btn-default">Continue deleting</button>
+				</form>
+				<a class="btn btn-danger" href="{{ url_for('categoryItemDetails', category_name=category_name, item_name=item.name)}}" role="button">Cancel</a>
+			</div>
+		</div>
+{% endblock %}
+
+		

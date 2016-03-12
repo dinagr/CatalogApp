@@ -1,0 +1,28 @@
+<html>
+<head>
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:700' rel='stylesheet' type='text/css'>
+	<link rel=stylesheet type=text/css href="{{url_for('static', filename='bootstrap.css')}}">
+    <link rel=stylesheet type=text/css href="{{url_for('static', filename='restStyle.css')}}">
+</head>
+<body class="subBcg">
+	<div class = "container">
+		<div class="row headline">
+			<div class="col-md-2 login">
+			{%if login_session.username %}
+				<a class="btn btn-warning btn-sm" href='{{url_for('disconnect') }}' role="button">Disconnect</a>
+			{%else %}
+				<a class="btn btn-warning btn-sm" href='{{url_for('showLogin') }}' role="button">Login</a>
+			{%endif%}
+			</div>
+			<div class="col-md-8">
+				<h1>Catalog App</h1>
+			</div>
+			<div class="col-md-2">
+				<div class="user">{{login_session.username}}</div>
+			</div>
+		</div>
+		{% block content %}
+		{% endblock %}
+	</div>
+</body>
+</html>
