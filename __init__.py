@@ -27,7 +27,6 @@ import data
 app = Flask(__name__)
 app.db = session
 # Loging in and loging out with google plus anf facebook functionality
-here = os.path.dirname(__file__)
 full_path_to_secrets_file = os.path.join('/var/www/catalogApp/catalogApp/', 'client_secrets.json')
 CLIENT_ID = json.loads(
     open(full_path_to_secrets_file, 'r').read())['web']['client_id']
