@@ -8,7 +8,7 @@ import random
 engine = create_engine('postgresql://catalog:catalogLinuxWebServer@localhost/categorieitems')
 
 Base.metadata.bind = engine
- 
+
 DBSession = sessionmaker(bind=engine)
 
 session = DBSession()
@@ -47,95 +47,102 @@ session.add(user3)
 session.commit()
 
 # Create categories and items
+userId1 = session.query(User).filter(User.name == "dina" and User.email == "dina@gmail.com").one()
+userId2 = session.query(User).filter(User.name == "alex" and User.email == "alex@gmail.com").one()
+userId3 = session.query(User).filter(User.name == "bob" and User.email == "bob@gmail.com").one()
 
-category1 = Category(name = "Soccer", user_id=1)
+category1 = Category(name = "Soccer", user_id=userId1.id)
 session.add(category1)
 session.commit()
-item1_1 = Item(category_id = 1, name = "Soccer Socks",
+categoryId1 = session.query(Category).filter(Category.name == "Soccer" and Category.user_id==userId1.id).one()
+item1_1 = Item(category_id = categoryId1.id, name = "Soccer Socks",
                description = "Soccer socks are extremely "
                "long. They cover shin-guards.",
                picture = "http://www.soccergarage.com/images/T/5-56.jpg",
-               user_id=1)
+               user_id=userId1.id)
 session.add(item1_1)
 session.commit()
-item1_2 = Item(category_id = 1, name = "Shin-Guards",
+item1_2 = Item(category_id = categoryId1.id, name = "Shin-Guards",
                description = "Shin-guards protect players shins, "
                "a vulnerable part of a players body that often gets kicked.",
-               user_id=2)
+               user_id= userId2.id)
 session.add(item1_2)
 session.commit()
-item1_3 = Item(category_id = 1, name = "Soccer Ball",
+item1_3 = Item(category_id = categoryId1.id, name = "Soccer Ball",
                description = "Soccer balls allows players to train "
                "and play individually or with friends outside of practice.",
                picture = "https://openclipart.org"
                "/image/2400px/svg_to_png/196123/1407858226.png",
-               user_id=1)
+               user_id=userId1.id)
 session.add(item1_3)
 session.commit()
-category2 = Category(name = "Basketball", user_id=2)
+category2 = Category(name = "Basketball", user_id=userId2.id)
 session.add(category2)
 session.commit()
-item2_1 = Item(category_id = 2, name = "Basketball sleeve",
+categoryId2 = session.query(Category).filter(Category.name == "Basketball" and Category.user_id==userId2.id).one()
+item2_1 = Item(category_id = categoryId2.id, name = "Basketball sleeve",
                description = "Made out of nylon and spandex, "
                "it extends from the biceps to the wrist",
                picture = "http://www.dickssportinggoods.com/graphics/"
                "product_images/pDSP1-18056254v750.jpg",
-               user_id=2)
+               user_id= userId2.id)
 session.add(item2_1)
 session.commit()
-item2_2 = Item(category_id = 2, name = "Basketball uniform",
+item2_2 = Item(category_id = categoryId2.id, name = "Basketball uniform",
                description = " Basketball uniforms consist of a jersey "
                "that features the number and last name of the player on "
                "the back, as well as shorts and athletic shoes.",
                picture = "http://www.ciscoathletic.com/wp-content/"
                "uploads/2013/12/259_samples_lg.jpg",
-               user_id=2)
+               user_id=userId2.id)
 session.add(item2_2)
 session.commit()
-item2_3 = Item(category_id = 2, name = "finger sleeve",
+item2_3 = Item(category_id = categoryId2.id, name = "finger sleeve",
                description = "The use of the finger sleeve is authorized"
                "and approved by the NBA (National Basketball Association). "
                "In many cases the finger sleeve is worn for protection instead"
                " of performing some sort of taping job on the digit.",
                picture = "http://ecx.images-amazon.com/images/"
                "I/41ai-7urQRL._SY300_.jpg",
-               user_id=3)
+               user_id= userId3.id)
 session.add(item2_3)
 session.commit()
-item2_4 = Item(category_id = 2, name = "Shot clock",
+item2_4 = Item(category_id = categoryId2.id, name = "Shot clock",
                description = "It is analogous with the play clock"
                "used in American and Canadian football.",
                picture = "http://cache.ultiworld.com/wordpress/"
                "wp-content/uploads/2012/09/shot_clock.jpg",
-               user_id=3)
+               user_id= userId3.id)
 session.add(item2_4)
 session.commit()
-category3 = Category(name = "Baseball", user_id=1)
+category3 = Category(name = "Baseball", user_id=userId1.id)
 session.add(category3)
-category4 = Category(name = "Frisbee", user_id=3)
+category4 = Category(name = "Frisbee", user_id= userId3.id)
 session.add(category4)
-category5 = Category(name = "Dancing", user_id=1)
+category5 = Category(name = "Dancing", user_id=userId1.id)
 session.add(category5)
-item5_1 = Item(category_id = 5, name = "Ballet dancing shoes",
+session.commit()
+categoryId5 = session.query(Category).filter(Category.name == "Dancing" and Category.user_id==userId1.id).one()
+item5_1 = Item(category_id = categoryId5.id, name = "Ballet dancing shoes",
                description = "Ballet shoes for women",
                picture = "http://www.mywearingideas.com/wp-content/"
                "uploads/2015/05/dance-shoes-4.jpg",
-               user_id=3)
+               user_id= userId3.id)
 session.add(item5_1)
 session.commit()
-item5_2 = Item(category_id = 5, name = "Steps dancing shoes",
+item5_2 = Item(category_id = categoryId5.id, name = "Steps dancing shoes",
                description = "steps dancing shoes for men and women",
                picture = "http://vitalleaders.blogs.uua.org/"
                "files/2013/11/shoes.jpg",
-               user_id=3)
+               user_id= userId3.id)
 session.add(item5_2)
 session.commit()
-category6 = Category(name = "Painting", user_id=1)
+category6 = Category(name = "Painting", user_id=userId1.id)
 session.add(category6)
 session.commit()
-category7 = Category(name = "Football", user_id=1)
+category7 = Category(name = "Football", user_id=userId1.id)
 session.add(category7)
 session.commit()
-category8 = Category(name = "Snowboarding", user_id=1)
+category8 = Category(name = "Snowboarding", user_id=userId1.id)
 session.add(category8)
 session.commit()

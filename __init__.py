@@ -8,14 +8,15 @@ from database_setup import Base, User, Category, Item
 from flask import session as login_session
 import random
 import string
+import httplib2
+import requests
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import httplib2
 import json
 from flask import make_response
-import requests
 from math import ceil
 import re
+import os
 
 engine = create_engine('postgresql://catalog:catalogLinuxWebServer@localhost/categorieitems')
 
@@ -26,8 +27,10 @@ import data
 app = Flask(__name__)
 app.db = session
 # Loging in and loging out with google plus anf facebook functionality
+here = os.path.dirname(__file__)
+full_path_to_secrets_file = os.path.join('/var/www/catalogApp/catalogApp/', 'client_secrets.json')
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open(full_path_to_secrets_file, 'r').read())['web']['client_id']
 APPLICATION_NAME = "Item Catalog"
 
 # Create anti-forgery state token
@@ -56,14 +59,11 @@ def fbconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     access_token = request.data
-
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
-        'web']['app_id']
+    full_path_to_fb_secrets_file = os.path.join('/var/www/catalogApp/catalogApp/', 'fb_client_secrets.json')
+    app_id = json.loads(open(full_path_to_fb_secrets_file, 'r').read())['web']['app_id']
     app_secret = json.loads(
-        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type='
-    'fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
+        open(full_path_to_fb_secrets_file, 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
@@ -76,6 +76,8 @@ def fbconnect():
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
+    # print(result)
+    # print('this is result')
     # print "url sent for API access:%s"% url
     # print "API JSON result: %s" % result
     data = json.loads(result)
@@ -90,8 +92,7 @@ def fbconnect():
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?'
-    '%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -119,8 +120,7 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/'
-    'permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     categories = app.db.query(Category).all()
@@ -136,9 +136,7 @@ def fbdisconnect():
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    print('in the begining')
     if request.args.get('state') != login_session['state']:
-        print('inside the condition')
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -147,12 +145,11 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        print('inside the try')
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+       #oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(full_path_to_secrets_file, scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        print('inside the except')
         response = make_response(
             json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -160,8 +157,7 @@ def gconnect():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'% access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
@@ -224,7 +220,7 @@ def gconnect():
     output += '<p class="logginMessage">Welcome, '
     output += login_session['username']
     output += '!</p>'
-    
+
     flash("you are now logged in as %s" % login_session['username'])
     return output
 
@@ -264,8 +260,6 @@ def createUser(login_session):
     app.db.add(newUser)
     app.db.commit()
     users = app.db.query(User).all()
-    for user in users:
-        print(user.id, user.name, user.email)
     user = app.db.query(User).filter_by(email=login_session['email']).one()
     return user.id
 
@@ -299,7 +293,7 @@ def disconnect():
 # The app functionality
 
 # The main page of the app
-# Presents all the categories and the recents added items    
+# Presents all the categories and the recents added items
 @app.route('/')
 @app.route('/main/')
 def allCategories():
@@ -325,7 +319,7 @@ def categoryItems(category_name):
     numOfItems = app.db.query(func.count('*')).\
                  select_from(Item).\
                  filter(Item.category_id==category.id).scalar()
-    return render_template('categoryitems.html', 
+    return render_template('categoryitems.html',
                            category_user_id = category.user_id,
                            category_name = category.name,
                            items=items, category=category,
@@ -369,9 +363,9 @@ def deleteCategory(category_name):
           app.db.delete(category)
           app.db.commit()
           flash("The category and the items were deleted successfully!")
-        else: 
+        else:
           flash("You are not authorized to delete this category!")
-      else: 
+      else:
         flash("You are not authorized to delete categories!")
       categories = app.db.query(Category).all()
       return allCategories()
@@ -408,7 +402,7 @@ def newCategory():
     else:
       return render_template('newcategoriemenu.html',
                               login_session = login_session)
-    
+
 # Display details of a specific item
 
 @app.route('/categories/<string:category_name>/<string:item_name>/')
@@ -447,11 +441,11 @@ def editCategoryItem(category_name, item_name):
                 item.category = categoryNew
                 app.db.commit()
                 flash("The item was edited successfully!")
-          else: 
+          else:
             flash ("You are not authorized to edit this item!")
-        else: 
+        else:
           flash("You are not authorized to edit items!")
-        items = app.db.query(Item).filter(Item.category_id==category.id).all()    
+        items = app.db.query(Item).filter(Item.category_id==category.id).all()
         return render_template('categoryitems.html',
                                category_name=category.name,
                                items=items,
@@ -478,9 +472,9 @@ def deleteCategoryItem(category_name, item_name):
             app.db.delete(item)
             app.db.commit()
             flash("The item was deleted successfully!")
-          else: 
+          else:
             flash ("You are not authorized to delete this item!")
-      else: 
+      else:
           flash("You are not authorized to delete items!")
       items = app.db.query(Item).filter(Item.category_id==category.id).all()
       return render_template('categoryitems.html',category_name=category.name,
@@ -540,7 +534,7 @@ def newItemInCategory(category_name):
     else:
         return render_template('newitemincategoriemenu.html',
                                  category = category,
-                                 login_session=login_session)      
+                                 login_session=login_session)
 
 
 
@@ -575,6 +569,4 @@ if __name__ == '__main__':
     # If debug is enabled, the server will reload itself each time it notices a
     # code change.
     app.debug = True
-    # host='0.0.0.0' tells the webserver on the vagrant machine to listen on
-    # all public IP-addresses.
-    app.run(host='0.0.0.0', port=5000)
+    #app.run(host='0.0.0.0', port=5000)
